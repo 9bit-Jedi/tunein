@@ -29,4 +29,7 @@ module.exports = {
       },
     }),
   ],
+  devServer: {
+    hot: true,  // Enable HMR
+  },
 };
