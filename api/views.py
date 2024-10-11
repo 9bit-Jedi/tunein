@@ -19,7 +19,7 @@ class RoomView(APIView):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # POST method - getting room details
-class CreateRoomView2(APIView):
+class CreateRoomView(APIView):
   
   serializer_class = CreateRoomSerializer
   
@@ -27,12 +27,10 @@ class CreateRoomView2(APIView):
     if not self.request.session.exists(self.request.session.session_key):
       self.request.session.create()
       print('session created')
-    print(request.session.session_key)
     
     serializer = CreateRoomSerializer(data=request.data)
-    print(serializer)
     if serializer.is_valid(): 
-      serializer.save()
+      # serializer.save()
       guest_can_pause = serializer.data.get('guest_can_pause')
       votes_to_skip = serializer.data.get('votes_to_skip')
       host = self.request.session.session_key
@@ -41,7 +39,7 @@ class CreateRoomView2(APIView):
       queryset = Room.objects.filter(host=host)
       print(queryset)
       if queryset.exists():
-        print('check - exists !')
+        print('check - room exists !')
         room = queryset[0]
         room.guest_can_pause = guest_can_pause
         room.votes_to_skip = votes_to_skip
@@ -52,35 +50,8 @@ class CreateRoomView2(APIView):
         print('check - does not exists !')
         room = Room.objects.create(host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
         room.save()
-        print('check - room class object saved with new params !')
         return Response(Roomserializer(room).data, status=status.HTTP_201_CREATED)
       
     else:       #serialiser not valid - bad reuqest error
       print('bad request')
       Response(CreateRoomSerializer(room).errors, status=status.HTTP_400_BAD_REQUEST)
-      
-class CreateRoomView(APIView):
-  
-  serializer_class = CreateRoomSerializer
-  
-  def post(self, request, format=None):
-
-    serializer = CreateRoomSerializer(data = request.data)
-    if serializer.is_valid():
-      if not self.request.session.exists(self.request.session.session_key):
-        self.request.session.create()
-        print('session created')
-    
-      host = self.request.session.session_key
-      guest_can_pause = serializer.validated_data.get('guest_can_pause')
-      votes_to_skip = serializer.validated_data.get('votes_to_skip')     
-       
-      print('sabb changa sii')
-      print(guest_can_pause, votes_to_skip)
-      room = Room( host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
-      room.save()
-      print('balle balle, kaam hogya sort !!')
-      
-      return Response(Roomserializer(room).data, status=status.HTTP_201_CREATED)
-    else:
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
