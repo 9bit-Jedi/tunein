@@ -13,7 +13,6 @@ function App() {
 
   return (
     <>
-    hello
       <Routes>
         <Route exact path="/" element={<Homepage />} />
         <Route path="/create-room" element={<CreateRoomPage />} />
